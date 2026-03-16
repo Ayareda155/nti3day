@@ -3,7 +3,27 @@ import 'ShopScreen.dart';
 import 'orders_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  PaintingBinding.instance.imageCache.maximumSize = 100;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 50 << 20;
   runApp(const MyApp());
+}
+
+// ── No Overscroll Behavior ──
+class NoOverscrollBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const ClampingScrollPhysics();
+  }
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -13,6 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      scrollBehavior: NoOverscrollBehavior(),
       home: const MainScreen(),
     );
   }
