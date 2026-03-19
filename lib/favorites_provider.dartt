@@ -1,0 +1,20 @@
+import 'package:flutter/material.dart';
+
+class FavoritesProvider extends ChangeNotifier {
+  static final FavoritesProvider _instance = FavoritesProvider._();
+  factory FavoritesProvider() => _instance;
+  FavoritesProvider._();
+
+  final List<Map<String, String>> items = [];
+
+  bool isFav(String imagePath) => items.any((p) => p['imagePath'] == imagePath);
+
+  void toggle(Map<String, String> product) {
+    if (isFav(product['imagePath']!)) {
+      items.removeWhere((p) => p['imagePath'] == product['imagePath']);
+    } else {
+      items.add(product);
+    }
+    notifyListeners();
+  }
+}

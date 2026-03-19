@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'ShopScreen.dart';
-import 'orders_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:task5/ShopScreen.dart';
+import 'package:task5/favorites_screen.dart';
+import 'package:task5/profile_screen.dart';
+import 'package:task5/search_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  PaintingBinding.instance.imageCache.maximumSize = 100;
-  PaintingBinding.instance.imageCache.maximumSizeBytes = 50 << 20;
   runApp(const MyApp());
 }
 
-// ── No Overscroll Behavior ──
-class NoOverscrollBehavior extends ScrollBehavior {
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const ClampingScrollPhysics();
-  }
 
+class NoStretchScrollBehavior extends ScrollBehavior {
   @override
   Widget buildOverscrollIndicator(
     BuildContext context,
@@ -33,7 +28,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      scrollBehavior: NoOverscrollBehavior(),
+      
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: NoStretchScrollBehavior(),
+          child: child!,
+        );
+      },
+      theme: ThemeData(fontFamily: 'Cairo'),
+      locale: const Locale('ar'),
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const MainScreen(),
     );
   }
@@ -41,34 +50,40 @@ class MyApp extends StatelessWidget {
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
-
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
-
-  final List<Widget> _screens = const [ShopScreen(), OrdersScreen()];
+  int currentIndex = 0;
+  final screens = const [
+    ShopScreen(),
+    SearchScreen(),
+    FavoritesScreen(),
+    ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex == 2 ? 1 : 0],
+      body: screens[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
         selectedItemColor: Colors.green[700],
         unselectedItemColor: Colors.grey,
-        currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (i) => setState(() => currentIndex = i),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'الرئيسية'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'بحث'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'طلباتي',
+            icon: Icon(Icons.favorite_border),
+            label: 'مفضلة',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'حسابي'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'حسابي',
+          ),
         ],
       ),
     );
