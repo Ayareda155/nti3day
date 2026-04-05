@@ -8,8 +8,10 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  List<TextEditingController> controllers =
-      List.generate(4, (index) => TextEditingController());
+  List<TextEditingController> controllers = List.generate(
+    4,
+    (index) => TextEditingController(),
+  );
   List<FocusNode> focusNodes = List.generate(4, (index) => FocusNode());
 
   @override
@@ -17,20 +19,20 @@ class _OtpScreenState extends State<OtpScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             buildIcon(),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             buildTitle(),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             buildSubTitle(),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             buildOtpFields(),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             buildConfirmButton(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             buildResendRow(),
           ],
         ),
@@ -42,23 +44,27 @@ class _OtpScreenState extends State<OtpScreen> {
     return Container(
       width: 100,
       height: 100,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Color(0xFF1AACB0),
         shape: BoxShape.circle,
       ),
-      child: Icon(Icons.lock_open_outlined, size: 50, color: Colors.white),
+      child: const Icon(
+        Icons.lock_open_outlined,
+        size: 50,
+        color: Colors.white,
+      ),
     );
   }
 
   Widget buildTitle() {
-    return Text(
+    return const Text(
       'OTP Verification',
       style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
     );
   }
 
   Widget buildSubTitle() {
-    return Text(
+    return const Text(
       'Enter the code sent to your phone',
       style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
     );
@@ -76,7 +82,7 @@ class _OtpScreenState extends State<OtpScreen> {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xFF1AACB0), width: 1.5),
+        border: Border.all(color: const Color(0xFF1AACB0), width: 1.5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
@@ -85,8 +91,8 @@ class _OtpScreenState extends State<OtpScreen> {
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
         maxLength: 1,
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        decoration: InputDecoration(
+        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        decoration: const InputDecoration(
           counterText: '',
           border: InputBorder.none,
         ),
@@ -103,18 +109,18 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Widget buildConfirmButton() {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
         onPressed: () {},
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF1AACB0),
+          backgroundColor: const Color(0xFF1AACB0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: Text(
+        child: const Text(
           'Confirm',
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
@@ -126,10 +132,10 @@ class _OtpScreenState extends State<OtpScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Didn't receive the code? "),
+        const Text("Didn't receive the code? "),
         GestureDetector(
           onTap: () {},
-          child: Text(
+          child: const Text(
             'Resend',
             style: TextStyle(
               color: Color(0xFFE63950),

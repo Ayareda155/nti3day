@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task4/features/auth/register/register_screen.dart';
+import 'package:task4/features/auth/Ui/register_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -55,57 +55,49 @@ class _SplashScreenState extends State<SplashScreen> {
                       style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
                     ),
                     SizedBox(height: 20),
-                    Container(
-                      padding: EdgeInsets.all(0),
-                      child: TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          hintText: 'Email',
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: Color(0xFF1AACB0),
-                          ),
-                          filled: true,
-                          fillColor: Color(0xFFF5F5F5),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide.none,
-                          ),
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        hintText: 'Email',
+                        prefixIcon: Icon(
+                          Icons.email_outlined,
+                          color: Color(0xFF1AACB0),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFF5F5F5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderSide: BorderSide.none,
                         ),
                       ),
                     ),
                     SizedBox(height: 12),
-                    Container(
-                      padding: EdgeInsets.all(0),
-                      child: TextField(
-                        controller: passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: 'Password',
-                          prefixIcon: Icon(
-                            Icons.lock_outline,
-                            color: Color(0xFF1AACB0),
-                          ),
-                          filled: true,
-                          fillColor: Color(0xFFF5F5F5),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide.none,
-                          ),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: 'Password',
+                        prefixIcon: Icon(
+                          Icons.lock_outline,
+                          color: Color(0xFF1AACB0),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFF5F5F5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderSide: BorderSide.none,
                         ),
                       ),
                     ),
                     SizedBox(height: 24),
-                    Positioned(
-                      bottom: 70,
-                      left: 30,
-                      right: 30,
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
                       child: ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF1AACB0),
                           foregroundColor: Colors.white,
-                          fixedSize: Size(double.infinity, 55),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
