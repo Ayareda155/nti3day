@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task4/features/auth/auth_bloc/auth_bloc.dart';
 import 'package:task4/features/auth/data/models/user_data_class.dart';
-import 'package:task4/features/auth/services/firebase_auth_services.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,31 +17,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  Future<void> _register(UserDataClass user) async {
-    UserCredential? userCredential = await FirebaseAuthService.register(user);
-    if (!mounted) return;
-    if (userCredential == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Register Failed")));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Register Successfully")));
-      Navigator.pushNamed(context, 'otp');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(children: [buildHeader(), buildForm()]),
-        ),
-      ),
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is RegisterSuccessState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Register Successfully")),
+          );
+          Navigator.pushNamed(context, 'otp');
+        } else if (state is RegisterFailureState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage ?? "Register Failed")),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [buildHeader(), buildForm(context, state)],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -74,7 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget buildForm() {
+  Widget buildForm(BuildContext context, AuthState state) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -92,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             isPassword: true,
           ),
           const SizedBox(height: 24),
-          buildRegisterButton(),
+          buildRegisterButton(context, state),
           const SizedBox(height: 16),
           buildLoginRow(),
         ],
@@ -123,31 +126,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget buildRegisterButton() {
+  Widget buildRegisterButton(BuildContext context, AuthState state) {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: () async {
-          if (_formKey.currentState!.validate()) {
-            await _register(
-              UserDataClass(
-                email: emailController.text.trim(),
-                password: passwordController.text.trim(),
-              ),
-            );
-          }
-        },
+        onPressed: state is RegisterLoadingState
+            ? null
+            : () {
+                if (_formKey.currentState!.validate()) {
+                  context.read<AuthBloc>().add(
+                    RegisterEvent(
+                      UserDataClass(
+                        email: emailController.text.trim(),
+                        password: passwordController.text.trim(),
+                      ),
+                    ),
+                  );
+                }
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1AACB0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          'Register',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
+        child: state is RegisterLoadingState
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text(
+                'Register',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
       ),
     );
   }

@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task4/features/auth/auth_bloc/auth_bloc.dart';
 import 'package:task4/features/auth/data/models/user_data_class.dart';
-import 'package:task4/features/auth/services/firebase_auth_services.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,44 +15,43 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  Future<void> _login(UserDataClass user) async {
-    UserCredential? userCredential = await FirebaseAuthService.login(user);
-    if (!mounted) return;
-    if (userCredential == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Login Failed")));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Login Successfully")));
-    }
-  }
-
-  Future<void> _loginWithGoogle() async {
-    UserCredential? user = await FirebaseAuthService.signInWithGoogle();
-    if (!mounted) return;
-    if (user != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Google Login Success")));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Google Login Failed")));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(children: [buildHeader(), buildForm()]),
-        ),
-      ),
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is LoginSuccessState) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("Login Successfully")));
+        } else if (state is LoginFailureState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage ?? "Login Failed")),
+          );
+        } else if (state is LoginWithGoogleSuccessState) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("Google Login Success")));
+        } else if (state is LoginWithGoogleFailureState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? "Google Login Failed"),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [buildHeader(), buildForm(context, state)],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -94,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget buildForm() {
+  Widget buildForm(BuildContext context, AuthState state) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -114,9 +113,9 @@ class _LoginScreenState extends State<LoginScreen> {
             isPassword: true,
           ),
           const SizedBox(height: 24),
-          buildLoginButton(),
+          buildLoginButton(context, state),
           const SizedBox(height: 12),
-          buildGoogleButton(),
+          buildGoogleButton(context, state),
           const SizedBox(height: 16),
           buildRegisterRow(),
         ],
@@ -147,42 +146,58 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget buildLoginButton() {
+  Widget buildLoginButton(BuildContext context, AuthState state) {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: () async {
-          if (_formKey.currentState!.validate()) {
-            await _login(
-              UserDataClass(
-                email: emailController.text.trim(),
-                password: passwordController.text.trim(),
-              ),
-            );
-          }
-        },
+        onPressed: state is LoginLoadingState
+            ? null
+            : () {
+                if (_formKey.currentState!.validate()) {
+                  context.read<AuthBloc>().add(
+                    LoginEvent(
+                      UserDataClass(
+                        email: emailController.text.trim(),
+                        password: passwordController.text.trim(),
+                      ),
+                    ),
+                  );
+                }
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1AACB0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          'Login',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
+        child: state is LoginLoadingState
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text(
+                'Login',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
       ),
     );
   }
 
-  Widget buildGoogleButton() {
+  Widget buildGoogleButton(BuildContext context, AuthState state) {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: OutlinedButton.icon(
-        onPressed: _loginWithGoogle,
-        icon: const Icon(Icons.g_mobiledata, size: 30),
+        onPressed: state is LoginWithGoogleLoadingState
+            ? null
+            : () {
+                context.read<AuthBloc>().add(LoginWithGoogleEvent());
+              },
+        icon: state is LoginWithGoogleLoadingState
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.g_mobiledata, size: 30),
         label: const Text('Sign in with Google'),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.black54,
